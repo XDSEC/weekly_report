@@ -2,6 +2,7 @@ use chrono::{serde::ts_seconds, DateTime, Datelike, Duration, Utc};
 use sea_orm::{
     entity::prelude::*, ActiveValue, FromQueryResult, IntoActiveModel, JoinType, QuerySelect,
 };
+use sea_orm::JsonValue;
 use serde::{Deserialize, Serialize};
 
 use crate::user;
@@ -15,6 +16,9 @@ pub struct Model {
     pub week: i32,
     #[sea_orm(column_type = "Text", nullable)]
     pub content: Option<String>,
+    // Use SeaORM's JsonValue for JSON column storage
+    #[sea_orm(column_type = "Json", nullable)]
+    pub likes: Option<JsonValue>,
     #[serde(with = "ts_seconds")]
     pub date: DateTime<Utc>,
 }
@@ -26,6 +30,8 @@ pub struct ExModel {
     pub author_name: String,
     pub week: i32,
     pub content: Option<String>,
+    // Keep the same JSON type for joined model
+    pub likes: Option<JsonValue>,
     #[serde(with = "ts_seconds")]
     pub date: DateTime<Utc>,
 }
@@ -163,6 +169,8 @@ where
         author_id: user_id,
         week,
         content: Some(content),
+        // default to empty JSON array to guarantee valid JSON stored
+        likes: Some(JsonValue::Array(vec![])),
         date: Utc::now(),
     };
     let model = model.into_active_model();
@@ -173,16 +181,43 @@ where
     model.insert(db).await
 }
 
+pub async fn get_by_id<C>(db: &C, id: i32) -> Result<Option<Model>, DbErr>
+where
+    C: ConnectionTrait,
+{
+    Entity::find_by_id(id).one(db).await
+}
+
 pub async fn update<C>(db: &C, model: Model) -> Result<Model, DbErr>
 where
     C: ConnectionTrait,
 {
-    let model = ActiveModel {
-        id: ActiveValue::Unchanged(model.id),
-        author_id: ActiveValue::Unchanged(model.author_id),
-        week: ActiveValue::Unchanged(model.week),
+    // Convert the incoming Model into an ActiveModel and update only the fields
+    // that should change. Using `reset_all()` here previously caused optional
+    // fields like `content` to become NotSet, which leads to clearing them in
+    // the DB on update. Instead, preserve the model's fields and only set the
+    // `date` to now.
+    let mut am = model.into_active_model();
+    am.date = ActiveValue::Set(Utc::now());
+    am.update(db).await
+}
+
+/// Update only the likes column for a given report id. This avoids touching
+/// other fields and is useful for concurrent-like operations.
+pub async fn update_likes_by_id<C>(
+    db: &C,
+    id: i32,
+    likes: Option<Vec<String>>,
+) -> Result<Model, DbErr>
+where
+    C: ConnectionTrait,
+{
+    // Use ActiveModel update for a single row instead of update_many
+    let am = ActiveModel {
+        id: ActiveValue::Set(id),
+        likes: ActiveValue::Set(likes.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::String).collect()))),
         date: ActiveValue::Set(Utc::now()),
-        ..model.into_active_model().reset_all()
+        ..Default::default()
     };
-    model.update(db).await
+    am.update(db).await
 }
