@@ -1,8 +1,9 @@
 export type MarkToType = "html" | "terminal";
 
 export interface MarkToHtmlOptions {
-    katex?: boolean;
-    prism?: boolean;
-    headingAnchors?: boolean;
-    toc?: boolean;
+  alertBlockquote?: boolean;
+  math?: boolean;
+  code?: boolean;
+  headingAnchors?: boolean;
+  toc?: boolean;
 }

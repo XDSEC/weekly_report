@@ -4,9 +4,11 @@ import { Title } from "@storage/header";
 import { t } from "@storage/theme";
 import { addToast } from "@storage/toast";
 import { getCurrentWeek } from "@lib/utils/time";
+import MojiPicker from "@lib/moji/picker";
 import Button from "@widgets/button";
 import Card from "@widgets/card";
 import Editor from "@widgets/editor";
+import Popover from "@widgets/popover";
 import type { HTTPError } from "ky";
 import { createSignal } from "solid-js";
 
@@ -14,6 +16,7 @@ export default function () {
     const [hasError, setHasError] = createSignal(false);
     const [content, setContent] = createSignal("");
     const [loading, setLoading] = createSignal(false);
+    let emojiTrigger: HTMLButtonElement | undefined;
     if (accountStore.user) {
         setLoading(true);
         get_report(accountStore.user.id, getCurrentWeek())
@@ -57,6 +60,20 @@ export default function () {
             <div class="p-3 lg:p-6 flex flex-col self-center w-full max-w-5xl flex-1 space-y-2">
                 <h1 class="h-12 flex flex-row space-x-2 items-center">
                     <span class="font-bold px-2 flex-1 text-start">{t("submit.title")}</span>
+                    <Popover
+                        square
+                        ghost
+                        size="sm"
+                        title={t("submit.insertMoji")}
+                        btnContent={<span class="shrink-0 icon-[fluent--emoji-20-regular] w-5 h-5" />}
+                        popContentClass="card z-50 p-3"
+                        ref={emojiTrigger}
+                        onOpenChange={(detail) => {
+                            if (!detail.open) emojiTrigger?.blur();
+                        }}
+                    >
+                        <MojiPicker onPick={(code) => setContent(content() + `:${code}:`)} />
+                    </Popover>
                     <Button size="sm" level="primary" onClick={handleSubmit} loading={loading()}>
                         {t("form.submit")}
                     </Button>
