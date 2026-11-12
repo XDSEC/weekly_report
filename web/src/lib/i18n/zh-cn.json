@@ -59,7 +59,8 @@
     "title": "提交周报",
     "required": "至少写点啥再交吧？",
     "placeholder": "支持 GitHub Favored Markdown 语法和外链图片，暂不支持上传图片，请使用公共图床。",
-    "success": "提交成功"
+    "success": "提交成功",
+    "insertMoji": "插入表情"
   },
   "admin": {
     "title": "管理"
@@ -82,6 +83,19 @@
     "title": "{{user}} 的第 {{week}} 周周报"
   }
   ,
+  "moji": {
+    "search": "搜索表情…",
+    "notFound": "没有找到表情",
+    "categories": {
+      "smileys": "表情",
+      "gestures": "手势",
+      "animals": "动物",
+      "food": "食物",
+      "activities": "活动",
+      "objects": "物品",
+      "symbols": "符号"
+    }
+  },
   "feed": {
     "needLogin": "请先登录以获取订阅链接",
     "tokenFetchFailed": "无法获取订阅 token",

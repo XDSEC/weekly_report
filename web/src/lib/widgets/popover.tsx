@@ -7,6 +7,8 @@ export default function (
         children?: JSX.Element;
         btnContent?: JSX.Element;
         popContentClass?: string;
+        /** called when the popover is opened or closed */
+        onOpenChange?: (details: { open: boolean }) => void;
     } & ButtonProps &
         ComponentProps<"button">
 ) {
@@ -20,7 +22,12 @@ export default function (
         "loading",
         "square",
     ]);
-    const [popoverProps, nativeProps] = splitProps(_1, ["children", "btnContent", "popContentClass"]);
+    const [popoverProps, nativeProps] = splitProps(_1, [
+        "children",
+        "btnContent",
+        "popContentClass",
+        "onOpenChange",
+    ]);
     const [opened, setOpened] = createSignal(false);
 
     const classList = () => {
@@ -48,6 +55,7 @@ export default function (
             autoFocus={false}
             onOpenChange={(detail) => {
                 setOpened(detail.open);
+                popoverProps.onOpenChange?.(detail);
             }}
         >
             <Popover.Trigger {...nativeProps} class={`${mergedClass()} ${nativeProps.class}`} title={nativeProps.title}>

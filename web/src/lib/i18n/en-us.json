@@ -59,7 +59,8 @@
     "title": "Submit weekly report",
     "required": "Can you at least write something before submit it?",
     "placeholder": "Supports GitHub Favored Markdown syntax and external link images. Uploading images is not supported yet. Please use the public image services.",
-    "success": "Submitted successfully"
+    "success": "Submitted successfully",
+    "insertMoji": "Insert moji"
   },
   "admin": {
     "title": "Admin"
@@ -82,6 +83,19 @@
     "title": "Weekly report {{week}} for {{user}}"
   }
   ,
+  "moji": {
+    "search": "Search moji…",
+    "notFound": "No moji found",
+    "categories": {
+      "smileys": "Smileys",
+      "gestures": "Gestures",
+      "animals": "Animals",
+      "food": "Food",
+      "activities": "Activities",
+      "objects": "Objects",
+      "symbols": "Symbols"
+    }
+  },
   "feed": {
     "needLogin": "Please log in to get subscription link",
     "tokenFetchFailed": "Unable to obtain subscription token",
