@@ -42,7 +42,7 @@ export function rehypeMoji() {
         replacement.push({
           type: "element",
           tagName: "span",
-          properties: { className: ["moji", item.icon] },
+          properties: { className: ["moji", item.icon], role: "img", ariaLabel: `:${item.code}:` },
           children: [],
         });
         last = start + match[0].length;
