@@ -1,0 +1,21 @@
+name: Backend Build
+
+on: [ push, pull_request ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build release
+        run: cargo build --verbose --release
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: wr-server
+          path: target/release/wr-server
+          retention-days: 14
+          archive: false
